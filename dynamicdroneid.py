@@ -35,6 +35,24 @@ master = mavutil.mavlink_connection('/dev/ttyACM0', baud=57600, source_system=25
 wait_heartbeat(master)
 print("Heartbeat received! The drone is connected.")
 
+# TESTING better way to retrieve existing droneid
+master.mav.param_request_read_send(
+        master.target_system,
+        master.target_component,
+        b'SYSID_THISMAV',
+        -1
+)
+
+while True:
+    try:
+        message = master.recv_match(type='SYSID_THISMAV', blocking=True)
+        if message is not None and message.param_id.decode('utf-8') == 'SYSID_THISMAV':
+            print(f"Parameter: {message.param_id}, value: {message.param_value}")
+            break
+    except Exception as e:
+        print(f"Error: {e}")
+        break
+
 # Compare the drone's ID to the IP-based value
 if master.target_system != newid: 
     # Set droneID to newid
