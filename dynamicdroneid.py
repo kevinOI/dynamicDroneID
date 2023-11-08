@@ -31,7 +31,7 @@ time.sleep(0.5)
 print("Splitting into groups delimited by '.'")
 str = str.split('.')
 time.sleep(0.5)
-newid = 66 #str[3]
+newid = int(str[3])
 print(f'The last three digits of the local IP address are: {newid}\n\n')
 time.sleep(0.5)
 
@@ -81,7 +81,7 @@ if master.target_system != newid:
             master.target_system,
             master.target_component,
             b'SYSID_THISMAV',
-            157,
+            newid,
             mavutil.mavlink.MAV_PARAM_TYPE_REAL32
     )
     time.sleep(0.5)
