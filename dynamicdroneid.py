@@ -4,8 +4,6 @@ import socket
 import os
 import time
 
-# Test initial commit #
-
 droneid = 0 # Initialize variable to store droneID that will be retrieved later
 dronecomponent = 0 # Intiialize variable to store droneComponent to 0
 
