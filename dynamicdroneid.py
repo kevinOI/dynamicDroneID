@@ -21,6 +21,33 @@ def wait_heartbeat(m):
     droneid = m.target_system # Store droneid
     dronecomponent = m.target_component # Store component
 
+def write_params():
+    print("Writing parameters to EEPROM...")
+    master.mav.command_long_send(
+         droneid,
+         master.target_component,
+         mavutil.mavlink.MAV_CMD_PREFLIGHT_STORAGE,
+         1,0,0,0,0,0,0,0
+    )
+
+def reboot_drone():
+    print("Rebooting drone...")
+    master.mav.command_long_send(
+         master.target_system,
+         master.target_component,
+         mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
+         0,1,0,0,0,0,0,0
+    )
+
+def set_sysid(id):
+    master.mav.param_set_send(
+        master.target_system,
+        master.target_component,
+        b'SYSID_THISMAV',
+        id,
+        mavutil.mavlink.MAV_PARAM_TYPE_REAL32
+    )
+
 #################################### Start of program ########################################
 ### Retrieve local IP address and process
 print("\n\n########################## IP RETRIEVAL ##############################")
@@ -77,29 +104,11 @@ if master.target_system != newid:
     print(f"Current sysID: {master.target_system}")
     time.sleep(0.5)
     print(f"Setting sysID to: {newid}")
-    master.mav.param_set_send(
-            master.target_system,
-            master.target_component,
-            b'SYSID_THISMAV',
-            newid,
-            mavutil.mavlink.MAV_PARAM_TYPE_REAL32
-    )
+    set_sysid(newid)
     time.sleep(0.5)
-    print("Writing parameters to EEPROM...")
-    master.mav.command_long_send(
-            droneid,
-            master.target_component,
-            mavutil.mavlink.MAV_CMD_PREFLIGHT_STORAGE,
-            1,0,0,0,0,0,0,0
-    )
+    write_params()
     time.sleep(0.5)
-    print("Rebooting drone...")
-    master.mav.command_long_send(
-            master.target_system,
-            master.target_component,
-            mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
-            0,1,0,0,0,0,0,0
-    )
+    reboot_drone()
     time.sleep(0.5)
     print("Closing connection to flight controller...")
     master.close()
